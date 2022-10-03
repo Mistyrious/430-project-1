@@ -1,80 +1,120 @@
 const tierlists = {
-  "fruits" : {
-    name: "fruits",
-    category: "foods",
-    items: ["apple", "strawberry", "orange", "banana", "peach", "kiwi", "grape", "cherry", "pineapple", "watermelon", "mango", "blueberry", "cantaloupe"],
+  fruits: {
+    name: 'fruits',
+    category: 'foods',
+    items: ['apple', 'strawberry', 'orange', 'banana', 'peach', 'kiwi', 'grape', 'cherry', 'pineapple', 'watermelon', 'mango', 'blueberry', 'cantaloupe'],
     scores: [3, 2, 5, 5, 6, 1, 5, 6, 2, 6, 5, 5, 4],
     votes: 1,
   },
-  "colors" : {
-    name: "colors",
-    category: "aesthetics",
-    items: ["black", "white", "red", "orange", "yellow", "green", "blue", "indigo", "violet", "pink"],
+  colors: {
+    name: 'colors',
+    category: 'aesthetics',
+    items: ['black', 'white', 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', 'pink'],
     scores: [6, 5, 2, 1, 3, 6, 6, 3, 4, 6],
     votes: 1,
-  }
+  },
 };
 // tier key: 1 is F, 2 D, 3 C, 4 B, 5 A, 6 S
 
 const respondJSON = (request, response, status, object) => {
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-  
-    response.writeHead(status, headers);
-    response.write(JSON.stringify(object));
-    response.end();
-  };
-  
-  const respondJSONMeta = (request, response, status) => {
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-  
-    response.writeHead(status, headers);
-    response.end();
+  const headers = {
+    'Content-Type': 'application/json',
   };
 
-  const getLists = (request, response) => {
-    const responseJSON = {
-        tierlists,
-      };
-      return respondJSON(request, response, 200, responseJSON);
+  response.writeHead(status, headers);
+  response.write(JSON.stringify(object));
+  response.end();
+};
+
+const respondJSONMeta = (request, response, status) => {
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+
+  response.writeHead(status, headers);
+  response.end();
+};
+
+const getLists = (request, response, params) => {
+  const listNames = Object.keys(tierlists);
+  const responseJSON = {
+    listNames,
+  };
+
+  if (params.category) {
+    const filteredLists = {};
+    listNames.forEach((list) => {
+      if (tierlists[list].category === params.category && !filteredLists[list]) {
+        filteredLists[list] = tierlists[list];
+      }
+    });
+    responseJSON.tierlists = Object.keys(filteredLists);
   }
 
-  const getListsMeta = (request, response) => respondJSONMeta(request, response, 200);
+  return respondJSON(request, response, 200, responseJSON);
+};
 
-  const addList = (request, response, body) =>{
-    let responseCode = 204;
-    const responseJSON = {
-      message: 'A list must have a name and at least five ranked items',
-    };
-  
-    if(!body.name || body.items.length < 5 || body.scores.length < 5){
-       responseJSON.id = 'addListMissingParams';
-       return respondJSON(request, response, 400, responseJSON);
-    }
+const getListsMeta = (request, response) => respondJSONMeta(request, response, 200);
 
-    if(tierlists[body.name]){
-      responseJSON.message = 'A list with that name already exists!';
-      return respondJSON(request, response, 400, responseJSON);
-    } else{
-      tierlists[body.name] = {
-        name: body.name,
-        scores: [], //add in the scores
-        votes: 1,
-      };
+const getTierlist = (request, response, params) => {
+  const responseJSON = {
+    message: 'No list selected',
+  };
 
-      responseJSON.message = 'Created successfully.';
-      return respondJSON(request, response, 201, responseJSON);
-    }
-  
-    //uhhhh check smth ur missing smth here i think
-    return respondJSONMeta(request, response, responseCode);
+  if (!params.name) {
+    respondJSON(request, response, 400, responseJSON);
   }
 
-  module.exports = {
-    getLists,
-    getListsMeta,
-    addList
+  responseJSON.message = 'Retrieving list';
+  responseJSON.list = tierlists[params.name];
+  return respondJSON(request, response, 200, responseJSON);
+};
+
+const getTierlistMeta = (request, response) => { respondJSONMeta(request, response, 200); };
+
+const addList = (request, response, body) => {
+  const responseJSON = {
+    message: 'A list must have a name and at least five ranked items',
+  };
+
+  if (!body.name || body.items.length < 5 || body.scores.length < 5) {
+    responseJSON.id = 'addListMissingParams';
+    return respondJSON(request, response, 400, responseJSON);
   }
+
+  if (tierlists[body.name]) {
+    responseJSON.message = 'A list with that name already exists!';
+    return respondJSON(request, response, 400, responseJSON);
+  }
+  console.log(body);
+  tierlists[body.name] = {
+    name: body.name,
+    scores: [], // add in the scores
+    votes: 1,
+  };
+
+  responseJSON.message = 'Created successfully.';
+  return respondJSON(request, response, 201, responseJSON);
+};
+
+const notFound = (request, response) => {
+  const responseJSON = {
+    message: 'The page you are looking for was not found.',
+    id: 'notFound',
+  };
+
+  return respondJSON(request, response, 404, responseJSON);
+};
+
+const notFoundMeta = (request, response) => respondJSONMeta(request, response, 404);
+
+
+module.exports = {
+  getLists,
+  getListsMeta,
+  getTierlist,
+  getTierlistMeta,
+  addList,
+  notFound,
+  notFoundMeta
+};
