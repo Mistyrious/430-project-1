@@ -108,7 +108,6 @@ const notFound = (request, response) => {
 
 const notFoundMeta = (request, response) => respondJSONMeta(request, response, 404);
 
-
 module.exports = {
   getLists,
   getListsMeta,
@@ -116,5 +115,5 @@ module.exports = {
   getTierlistMeta,
   addList,
   notFound,
-  notFoundMeta
+  notFoundMeta,
 };
