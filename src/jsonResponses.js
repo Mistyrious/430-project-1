@@ -4,6 +4,7 @@ const tierlists = {
     category: 'foods',
     items: ['apple', 'strawberry', 'orange', 'banana', 'peach', 'kiwi', 'grape', 'cherry', 'pineapple', 'watermelon', 'mango', 'blueberry', 'cantaloupe'],
     scores: [3, 2, 5, 5, 6, 1, 5, 6, 2, 6, 5, 5, 4],
+    trueScores: [3, 2, 5, 5, 6, 1, 5, 6, 2, 6, 5, 5, 4],
     votes: 1,
   },
   colors: {
@@ -11,6 +12,7 @@ const tierlists = {
     category: 'aesthetics',
     items: ['black', 'white', 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', 'pink'],
     scores: [6, 5, 2, 1, 3, 6, 6, 3, 4, 6],
+    trueScores: [6, 5, 2, 1, 3, 6, 6, 3, 4, 6],
     votes: 1,
   },
 };
@@ -48,7 +50,7 @@ const getLists = (request, response, params) => {
         filteredLists[list] = tierlists[list];
       }
     });
-    responseJSON.tierlists = Object.keys(filteredLists);
+    responseJSON.listNames = Object.keys(filteredLists);
   }
 
   return respondJSON(request, response, 200, responseJSON);
@@ -89,12 +91,40 @@ const addList = (request, response, body) => {
   console.log(body);
   tierlists[body.name] = {
     name: body.name,
-    scores: [], // add in the scores
+    scores: body.scores,
+    trueScores: body.scores,
     votes: 1,
   };
 
   responseJSON.message = 'Created successfully.';
   return respondJSON(request, response, 201, responseJSON);
+};
+
+const updateList = (request, response, body) => {
+  const responseJSON = {
+    message: 'You have not ranked every item',
+  };
+
+  if (body.scores.length !== tierlists[body.name].scores.length) {
+    responseJSON.id = 'updateListMissingParams';
+    return respondJSON(request, response, 400, responseJSON);
+  }
+
+  const { votes } = tierlists[body.name];
+
+  for (let i = 0; i < body.scores.length; i++) {
+    const oldTrueScore = tierlists[body.name].trueScores[i];
+    const newTrueScore = (oldTrueScore * votes + body.scores[i]) / (votes + 1);
+    // ^ average in the new value
+    tierlists[body.name].trueScores[i] = newTrueScore;
+    tierlists[body.name].scores[i] = Math.round(newTrueScore);
+  }
+
+  tierlists[body.name].votes += 1;
+
+  responseJSON.message = 'Updated successfully.';
+  responseJSON.list = tierlists[body.name];
+  return respondJSON(request, response, 200, responseJSON);
 };
 
 const notFound = (request, response) => {
@@ -114,6 +144,7 @@ module.exports = {
   getTierlist,
   getTierlistMeta,
   addList,
+  updateList,
   notFound,
   notFoundMeta,
 };

@@ -53,13 +53,19 @@ const onRequest = (request, response) => {
   if (!urlStruct[request.method]) {
     return urlStruct.HEAD.notFound(request, response);
   }
-
-  if (urlStruct[request.method][pUrl.pathname] === 'addList') {
-    return urlStruct[request.method][pUrl.pathname](request, response, jsonHandler.addList);
-  } if (urlStruct[request.method][pUrl.pathname]) {
-    return urlStruct[request.method][pUrl.pathname](request, response, query.parse(pUrl.query));
+  if (!urlStruct[request.method][pUrl.pathname]) {
+    return urlStruct[request.method].notFound(request, response);
   }
-  return urlStruct[request.method].notFound(request, response);
+
+  if (pUrl.pathname === '/addList') {
+    return urlStruct[request.method][pUrl.pathname](request, response, jsonHandler.addList);
+  }
+
+  if (pUrl.pathname === '/updateList') {
+    return urlStruct[request.method][pUrl.pathname](request, response, jsonHandler.updateList);
+  }
+
+  return urlStruct[request.method][pUrl.pathname](request, response, query.parse(pUrl.query));
 };
 
 http.createServer(onRequest).listen(port, () => {
