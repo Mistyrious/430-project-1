@@ -39,8 +39,14 @@ const respondJSONMeta = (request, response, status) => {
 
 const getLists = (request, response, params) => {
   const listNames = Object.keys(tierlists);
+  const listCategories = [];
+  listNames.forEach((list) => {
+    listCategories.push(tierlists[list].category);
+  });
+
   const responseJSON = {
     listNames,
+    listCategories,
   };
 
   if (params.category) {
