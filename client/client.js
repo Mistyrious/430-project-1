@@ -28,15 +28,17 @@ const addCreation = (amount) => {
     if(!creationForm.innerHTML){
         creationForm.innerHTML += `
         <h2>Tierlist Creator</h2>
-        <label for="name">Name: </label>
-        <input id="name" type="text" name="listName">
+        <label for="listName">Name: </label>
+        <input id="listName" type="text" name="listName">
         <ol id="itemInputs"></ol>
-        <button id="addItem">Add Item Field</button>
+        <button id="addItem" type="button">Add Item Field</button>
         <input type="submit" value="Create List">`;
     }
     for(let i = 0; i < amount; i++){
         addItemInput();
     }
+
+    document.querySelector('#addItem').addEventListener('click', addItemInput);
 }
 
 const addItemInput = () => {
@@ -94,7 +96,6 @@ const displaySelects = (listData) => {
 
 
 const sendPost = async (url, body, responseHandler) => {
-
     const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -160,15 +161,36 @@ const init = () => {
         return false;
     });
 
-    // listCreation.addEventListener('submit', (e) => {
-    //     e.preventDefault();
-    //     sendPost(listCreation, );
-    //     return false;
-    // });
+    listCreation.addEventListener('submit', (e) => {
+        console.log("creation event called");
+        e.preventDefault();
+
+        const listName = document.querySelector('#listName').value;
+        const itemOL = document.querySelector('#itemInputs');
+
+        let formData = `name=${listName}`;
+
+        const itemNames = [], itemScores = [];
+
+        for(let i = 1; i < itemOL.childElementCount + 1; i++){
+            itemNames.push(document.querySelector(`#item${i}`).value);
+            itemScores.push(document.querySelector(`#item${i}Score`).value);
+        }
+
+        const items = encodeURIComponent(JSON.stringify(itemNames));
+        const scores = encodeURIComponent(JSON.stringify(itemScores));
+
+        formData += `&items=${items}&scores=${scores}`;
+
+
+        console.log(formData);
+        sendPost('/addList', formData, handleResponse);
+        return false;
+    });
 
     listRanker.addEventListener('submit', (e) => {
         e.preventDefault();
-        sendPost(listRanker, );
+        //sendPost(listRanker, );
     })
 
     sendGet('getLists', displaySelects);

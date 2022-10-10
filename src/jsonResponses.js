@@ -81,6 +81,7 @@ const getTierlist = (request, response, params) => {
 const getTierlistMeta = (request, response) => { respondJSONMeta(request, response, 200); };
 
 const addList = (request, response, body) => {
+  console.log(body);
   const responseJSON = {
     message: 'A list must have a name and at least five ranked items',
   };
@@ -97,6 +98,7 @@ const addList = (request, response, body) => {
   console.log(body);
   tierlists[body.name] = {
     name: body.name,
+    items: body.items,
     scores: body.scores,
     trueScores: body.scores,
     votes: 1,
