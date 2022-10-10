@@ -23,6 +23,50 @@ const handleResponse = async (response, parseResponse) => {
     }
 };
 
+const addCreation = (amount) => {
+    let creationForm = document.querySelector('#listCreation');
+    if(!creationForm.innerHTML){
+        creationForm.innerHTML += `
+        <h2>Tierlist Creator</h2>
+        <label for="name">Name: </label>
+        <input id="name" type="text" name="listName">
+        <ol id="itemInputs"></ol>
+        <button id="addItem">Add Item Field</button>
+        <input type="submit" value="Create List">`;
+    }
+    for(let i = 0; i < amount; i++){
+        addItemInput();
+    }
+}
+
+const addItemInput = () => {
+    let itemOL = document.querySelector('#itemInputs');
+    let i = itemOL.childElementCount + 1;
+    let newLI = document.createElement('li');
+    itemOL.appendChild(newLI);
+
+    const newInput = document.createElement('input');
+    newInput.id=`item${i}`;
+    newInput.type="text";
+    newInput.name=`item${i}`;
+    newInput.placeholder="Item Name";
+
+    const newSelect = document.createElement('select');
+    newSelect.id = `item${i}Score`;
+    newSelect.innerHTML = `
+        <option value="">Item Score</option>
+        <option value="6">S</option>
+        <option value="5">A</option>
+        <option value="4">B</option>
+        <option value="3">C</option>
+        <option value="2">D</option>
+        <option value="1">F</option>
+    `;
+
+    newLI.appendChild(newInput);
+    newLI.appendChild(newSelect);
+}
+
 const displaySelects = (listData) => {
     const categorySelect = document.querySelector('#listCategory');
     const listSelect = document.querySelector('#listSelect');
@@ -52,7 +96,7 @@ const displaySelects = (listData) => {
 const sendPost = async (url, body, responseHandler) => {
 
     const response = await fetch(url, {
-        method: nameMethod,
+        method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -77,10 +121,26 @@ const sendGet = async(url, responseHandler) => {
 }
 
 const init = () => {
+    const initialMenu = document.querySelector('#initial-menu');
+    const initialSelect = document.querySelector('#initial-select');
+    const initialCreate = document.querySelector('#initial-create');
+
     const listSelection = document.querySelector('#listChoiceForm');
     const listCategory = document.querySelector('#listCategory');
     const listCreation = document.querySelector('#listCreation');
     const listRanker = document.querySelector('#listCreation');
+
+    initialSelect.addEventListener('click', () => {
+        initialMenu.style.display = "none";
+        displaySelects();
+        //listSelection.style.display = "initial";
+    });
+
+    initialCreate.addEventListener('click', () => {
+        initialMenu.style.display = "none";
+        addCreation(5);
+        //listCreation.style.display = "initial";
+    });
 
     listCategory.addEventListener('change', (e) => {
         e.preventDefault();
@@ -100,15 +160,15 @@ const init = () => {
         return false;
     });
 
-    listCreation.addEventListener('submit', (e) => {
-        e.preventDefault();
-        sendPost(listCreation, );
-        return false;
-    });
+    // listCreation.addEventListener('submit', (e) => {
+    //     e.preventDefault();
+    //     sendPost(listCreation, );
+    //     return false;
+    // });
 
     listRanker.addEventListener('submit', (e) => {
         e.preventDefault();
-        sendPost(listRanker, )
+        sendPost(listRanker, );
     })
 
     sendGet('getLists', displaySelects);

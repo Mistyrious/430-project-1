@@ -16,41 +16,26 @@
 
     <main>
         <!-- add toggle for selection or creation -->
-        <div id="selectionArea">
-            <h2>Load a Tierlist</h2>
-            <form id="listChoiceForm">
-                <label for="listCategory">Filter by Category:</label>
-                <select id="listCategory"></select>
-
-                <label for="listSelect">Select Tierlist:</label>
-                <select id="listSelect"></select>
-
-                <input type="submit" value="Load List">
-            </form>
-            <form id="listCreation">
-                <h2>Create a Tierlist:</h2>
-                <label for="name">Name: </label>
-                <input id="name" type="text" name="listName">
-                <div id="itemInputs">
-                    <label for="item1">Item 1:</label>
-                    <input id="item1" type="text" name="item1">
-    
-                    <label for="item2">Item 2:</label>
-                    <input id="item2" type="text" name="item2">
-    
-                    <label for="item3">Item 3:</label>
-                    <input id="item3" type="text" name="item3">
-    
-                    <label for="item4">Item 4:</label>
-                    <input id="item4" type="text" name="item4">
-    
-                    <label for="item5">Item 5:</label>
-                    <input id="item5" type="text" name="item5">
-                </div>
-                <button id="addItem">Add Item Field</button>
-                <input type="submit" value="Create List">
-            </form>
+        <div id="initial-menu">
+            <div>
+                <h2>Load a Tierlist:</h2>
+                <button id="initial-select">Show my options!</button>
+            </div>
+            <div>
+                <h2>Make a Tierlist:</h2>
+                <button id="initial-create">Create a tierlist!</button>
+            </div>
         </div>
+        <form id="listChoiceForm">
+            <label for="listCategory">Filter by Category:</label>
+            <select id="listCategory"></select>
+
+            <label for="listSelect">Select Tierlist:</label>
+            <select id="listSelect"></select>
+
+            <input type="submit" value="Load List">
+        </form>
+        <form id="listCreation" action="/addList" method="POST"></form>
         <div id="tierList">
 
         </div>

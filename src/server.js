@@ -48,7 +48,7 @@ const urlStruct = {
 
 const onRequest = (request, response) => {
   const pUrl = url.parse(request.url);
-  console.log(request.method);
+  console.log(pUrl, request.method);
 
   if (!urlStruct[request.method]) {
     return urlStruct.HEAD.notFound(request, response);
