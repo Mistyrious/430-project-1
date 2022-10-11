@@ -24,12 +24,14 @@ const handleResponse = async (response, parseResponse) => {
 };
 
 const addCreation = (amount) => {
-    let creationForm = document.querySelector('#listCreation');
+    let creationForm = document.getElementById('listCreation');
     if(!creationForm.innerHTML){
         creationForm.innerHTML += `
         <h2>Tierlist Creator</h2>
         <label for="listName">Name: </label>
         <input id="listName" type="text" name="listName">
+        <label for="categoryInput">Category: </label>
+        <input id="categoryInput" type="text" name="categoryInput">
         <ol id="itemInputs"></ol>
         <button id="addItem" type="button">Add Item Field</button>
         <input type="submit" value="Create List">`;
@@ -38,7 +40,7 @@ const addCreation = (amount) => {
         addItemInput();
     }
 
-    document.querySelector('#addItem').addEventListener('click', addItemInput);
+    document.getElementById('addItem').addEventListener('click', addItemInput);
 }
 
 const addItemInput = () => {
@@ -70,15 +72,18 @@ const addItemInput = () => {
 }
 
 const displaySelects = (listData) => {
-    const categorySelect = document.querySelector('#listCategory');
-    const listSelect = document.querySelector('#listSelect');
+    console.log(listData);
+    const categorySelect = document.getElementById('listCategory');
+    const listSelect = document.getElementById('listSelect');
 
     if (categorySelect.innerHTML === "") {
         const emptyValue = document.createElement('option');
         emptyValue.value = "";
         emptyValue.innerHTML = "";
         categorySelect.appendChild(emptyValue);
-        listData.listCategories.forEach((category) => {
+
+        const uniqueCategories = new Set(listData.listCategories);
+        uniqueCategories.forEach((category) => {
             const newValue = document.createElement('option');
             newValue.value - category;
             newValue.innerHTML = category;
@@ -94,6 +99,25 @@ const displaySelects = (listData) => {
     });
 }
 
+const displayVoting = (data) => {
+    
+}
+
+const displayList = (data) => {
+    const list = data.list;
+    const content = document.getElementById('tierList');
+
+    const items = [[], [], [], [], [], []];
+    for(let i = 0; i < list.items.length; i++){
+        items[list.scores[i]-1].push(list.items[i]);     
+    }
+
+    for(let i = 0; i < 6; i++){
+        document.getElementById(`${i+1}Items`).innerText = items[i].join(', ');
+    }
+
+    displayVoting(data);
+}
 
 const sendPost = async (url, body, responseHandler) => {
     const response = await fetch(url, {
@@ -122,30 +146,30 @@ const sendGet = async(url, responseHandler) => {
 }
 
 const init = () => {
-    const initialMenu = document.querySelector('#initial-menu');
-    const initialSelect = document.querySelector('#initial-select');
-    const initialCreate = document.querySelector('#initial-create');
+    const initialMenu = document.getElementById('initial-menu');
+    const initialSelect = document.getElementById('initial-select');
+    const initialCreate = document.getElementById('initial-create');
 
-    const listSelection = document.querySelector('#listChoiceForm');
-    const listCategory = document.querySelector('#listCategory');
-    const listCreation = document.querySelector('#listCreation');
-    const listRanker = document.querySelector('#listCreation');
+    const listSelection = document.getElementById('listChoiceForm');
+    const listCategory = document.getElementById('listCategory');
+    const listCreation = document.getElementById('listCreation');
+    const listRanker = document.getElementById('listCreation');
 
     initialSelect.addEventListener('click', () => {
         initialMenu.style.display = "none";
-        displaySelects();
-        //listSelection.style.display = "initial";
+        sendGet('/getLists', displaySelects);
+        listSelection.style.display = "initial";
     });
 
     initialCreate.addEventListener('click', () => {
         initialMenu.style.display = "none";
         addCreation(5);
-        //listCreation.style.display = "initial";
+        listCreation.style.display = "initial";
     });
 
     listCategory.addEventListener('change', (e) => {
         e.preventDefault();
-        const selectedCategory = document.querySelector('#listCategory').value;
+        const selectedCategory = document.getElementById('listCategory').value;
         let url = selectedCategory ? `/getLists?category=${selectedCategory}` : '/getLists';
     
         sendGet(url, displaySelects);
@@ -154,7 +178,7 @@ const init = () => {
 
     listSelection.addEventListener('submit', (e) => {
         e.preventDefault();
-        const selectedList = document.querySelector('#listSelect').value;
+        const selectedList = document.getElementById('listSelect').value;
         const url = selectedList ? `/getTierlist?name=${selectedList}` : '/getTierlist';
     
         sendGet(url, displayList);
@@ -162,13 +186,13 @@ const init = () => {
     });
 
     listCreation.addEventListener('submit', (e) => {
-        console.log("creation event called");
         e.preventDefault();
 
-        const listName = document.querySelector('#listName').value;
+        const listName = encodeURIComponent(document.querySelector('#listName').value);
+        const category = encodeURIComponent(document.querySelector('#categoryInput').value);
         const itemOL = document.querySelector('#itemInputs');
 
-        let formData = `name=${listName}`;
+        let formData = `name=${listName}&category=${category}`;
 
         const itemNames = [], itemScores = [];
 
@@ -177,8 +201,11 @@ const init = () => {
             itemScores.push(document.querySelector(`#item${i}Score`).value);
         }
 
-        const items = encodeURIComponent(JSON.stringify(itemNames));
-        const scores = encodeURIComponent(JSON.stringify(itemScores));
+        const items = encodeURIComponent(itemNames);
+        const scores = encodeURIComponent(itemScores);
+        console.log(items);
+
+        //formData += "&items=" + items + "&scores=" + scores;
 
         formData += `&items=${items}&scores=${scores}`;
 
@@ -192,8 +219,6 @@ const init = () => {
         e.preventDefault();
         //sendPost(listRanker, );
     })
-
-    sendGet('getLists', displaySelects);
 }
 
 window.onload = init;

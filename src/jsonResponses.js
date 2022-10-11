@@ -86,7 +86,7 @@ const addList = (request, response, body) => {
     message: 'A list must have a name and at least five ranked items',
   };
 
-  if (!body.name || body.items.length < 5 || body.scores.length < 5) {
+  if (!body.name || !body.category || body.items.length < 5 || body.scores.length < 5) {
     responseJSON.id = 'addListMissingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
@@ -98,9 +98,10 @@ const addList = (request, response, body) => {
   console.log(body);
   tierlists[body.name] = {
     name: body.name,
-    items: body.items,
-    scores: body.scores,
-    trueScores: body.scores,
+    category: body.category,
+    items: body.items.split(','),
+    scores: body.scores.split(',').map(Number),
+    trueScores: body.scores.split(',').map(Number),
     votes: 1,
   };
 
@@ -120,9 +121,11 @@ const updateList = (request, response, body) => {
 
   const { votes } = tierlists[body.name];
 
+  const userScores = body.scores.split(',').map(Number);
+
   for (let i = 0; i < body.scores.length; i++) {
     const oldTrueScore = tierlists[body.name].trueScores[i];
-    const newTrueScore = (oldTrueScore * votes + body.scores[i]) / (votes + 1);
+    const newTrueScore = (oldTrueScore * votes + userScores[i]) / (votes + 1);
     // ^ average in the new value
     tierlists[body.name].trueScores[i] = newTrueScore;
     tierlists[body.name].scores[i] = Math.round(newTrueScore);
