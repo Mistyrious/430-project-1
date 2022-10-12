@@ -48,8 +48,9 @@ const urlStruct = {
 
 const onRequest = (request, response) => {
   const pUrl = url.parse(request.url);
-  console.log(pUrl, request.method);
+  //console.log(pUrl, request.method);
 
+  // weed out invalid paths
   if (!urlStruct[request.method]) {
     return urlStruct.HEAD.notFound(request, response);
   }
@@ -57,6 +58,7 @@ const onRequest = (request, response) => {
     return urlStruct[request.method].notFound(request, response);
   }
 
+  // following two send the correct handler for the POST methods
   if (pUrl.pathname === '/addList') {
     return urlStruct[request.method][pUrl.pathname](request, response, jsonHandler.addList);
   }
@@ -65,6 +67,7 @@ const onRequest = (request, response) => {
     return urlStruct[request.method][pUrl.pathname](request, response, jsonHandler.updateList);
   }
 
+  // if the path exists and isn't a POST, user ends up here
   return urlStruct[request.method][pUrl.pathname](request, response, query.parse(pUrl.query));
 };
 

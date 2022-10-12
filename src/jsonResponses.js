@@ -1,3 +1,5 @@
+// initial two tierlists
+// tier key: 1 is F, 2 D, 3 C, 4 B, 5 A, 6 S
 const tierlists = {
   fruits: {
     name: 'fruits',
@@ -16,7 +18,6 @@ const tierlists = {
     votes: 1,
   },
 };
-// tier key: 1 is F, 2 D, 3 C, 4 B, 5 A, 6 S
 
 const respondJSON = (request, response, status, object) => {
   const headers = {
@@ -37,6 +38,7 @@ const respondJSONMeta = (request, response, status) => {
   response.end();
 };
 
+// retrieves names and categories of existing lists
 const getLists = (request, response, params) => {
   const listNames = Object.keys(tierlists);
   const listCategories = [];
@@ -64,6 +66,7 @@ const getLists = (request, response, params) => {
 
 const getListsMeta = (request, response) => respondJSONMeta(request, response, 200);
 
+// retrieves a tierlist's data
 const getTierlist = (request, response, params) => {
   const responseJSON = {
     message: 'No list selected',
@@ -73,29 +76,32 @@ const getTierlist = (request, response, params) => {
     respondJSON(request, response, 400, responseJSON);
   }
 
-  responseJSON.message = 'Retrieving list';
+  responseJSON.message = 'List retrieved!';
   responseJSON.list = tierlists[params.name];
   return respondJSON(request, response, 200, responseJSON);
 };
 
 const getTierlistMeta = (request, response) => { respondJSONMeta(request, response, 200); };
 
+// adds a tierlist to the data
 const addList = (request, response, body) => {
-  console.log(body);
   const responseJSON = {
     message: 'A list must have a name and at least five ranked items',
   };
 
+  // 400 if invalid
   if (!body.name || !body.category || body.items.length < 5 || body.scores.length < 5) {
     responseJSON.id = 'addListMissingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
 
+  // user cannot make a list with duplicate name
   if (tierlists[body.name]) {
     responseJSON.message = 'A list with that name already exists!';
     return respondJSON(request, response, 400, responseJSON);
   }
-  console.log(body);
+
+  // put data into tierlists object
   tierlists[body.name] = {
     name: body.name,
     category: body.category,
@@ -105,24 +111,27 @@ const addList = (request, response, body) => {
     votes: 1,
   };
 
-  responseJSON.message = 'Created successfully.';
+  responseJSON.message = 'Created successfully! Load from homepage.';
   return respondJSON(request, response, 201, responseJSON);
 };
 
+// adds user's scores to a tierlist's average
 const updateList = (request, response, body) => {
+  const userScores = body.scores.split(',').map(Number);
+
   const responseJSON = {
-    message: 'You have not ranked every item',
+    message: 'You have not ranked every item.',
   };
 
-  if (body.scores.length !== tierlists[body.name].scores.length) {
+  // invalid if user has not ranked all items
+  if (userScores.length !== tierlists[body.name].scores.length) {
     responseJSON.id = 'updateListMissingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
 
   const { votes } = tierlists[body.name];
 
-  const userScores = body.scores.split(',').map(Number);
-
+  // modify the stored scores
   for (let i = 0; i < body.scores.length; i++) {
     const oldTrueScore = tierlists[body.name].trueScores[i];
     const newTrueScore = (oldTrueScore * votes + userScores[i]) / (votes + 1);
@@ -133,7 +142,7 @@ const updateList = (request, response, body) => {
 
   tierlists[body.name].votes += 1;
 
-  responseJSON.message = 'Updated successfully.';
+  responseJSON.message = 'Updated successfully! Load list again to view changes.';
   responseJSON.list = tierlists[body.name];
   return respondJSON(request, response, 200, responseJSON);
 };

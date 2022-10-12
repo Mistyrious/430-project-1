@@ -7,70 +7,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Collective Tierlist</title>
 
+    <link rel="stylesheet" href="https://use.typekit.net/mgh4ouh.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" type="text/css" href="/style.css">
     <script src="/bundle.js"></script>
 </head>
 
 <body>
-    <header></header>
+    <header class="hero is-dark">
+        <div class="hero-body has-text-centered">
+            <h1 class="title is-size-1"><a href="/">Collective Tierlist</a></h1>
+            <a class="button" href="/">Homepage</a>
+        </div>
+        <div class="notification is-dark has-text-centered" id="status"></div>
+    </header>
 
     <main>
-        <!-- add toggle for selection or creation -->
-        <div id="initial-menu">
-            <div>
-                <h2>Load a Tierlist:</h2>
-                <button id="initial-select">Show my options!</button>
+        <div class="columns is-vcentered" id="initial-menu">
+            <div class="column is-half m-auto">
+                <h2 class="title is-2">Load a Tierlist:</h2>
+                <button class="button" id="initial-select">Show my options!</button>
             </div>
-            <div>
-                <h2>Make a Tierlist:</h2>
-                <button id="initial-create">Create a tierlist!</button>
+            <div class="column is-half m-auto">
+                <h2 class="title is-2">Make a Tierlist:</h2>
+                <button class="button" id="initial-create">Create a tierlist!</button>
             </div>
         </div>
-        <form id="listChoiceForm">
-            <label for="listCategory">Filter by Category:</label>
-            <select id="listCategory"></select>
-
-            <label for="listSelect">Select Tierlist:</label>
-            <select id="listSelect"></select>
-
-            <input type="submit" value="Load List">
-        </form>
-        <form id="listCreation"></form>
-        <div id="tierList">
-            <table>
-                <tr>
-                    <th>Tier</th>
-                    <th>Items</th>
-                </tr>
-                <tr>
-                    <th>S</th>
-                    <td id="6Items"></td>
-                </tr>
-                <tr>
-                    <th>A</th>
-                    <td id="5Items"></td>
-                </tr>
-                <tr>
-                    <th>B</th>
-                    <td id="4Items"></td>
-                </tr>
-                <tr>
-                    <th>C</th>
-                    <td id="3Items"></td>
-                </tr>
-                <tr>
-                    <th>D</th>
-                    <td id="2Items"></td>
-                </tr>
-                <tr>
-                    <th>F</th>
-                    <td id="1Items"></td>
-                </tr>
-            </table>
+        
+        <div class="columns is-vcentered">
+            <div class="column is-half m-auto">
+                <form class="form" id="listChoiceForm">
+                    <h2 class="title is-2 has-text-centered">Load a Tierlist:</h2>
+                    <div class="field is-grouped">
+                        <label class="label" for="listCategory">Filter by Category: </label>
+                        <div class="select is-fullwidth">
+                            <select id="listCategory"></select>
+                        </div>
+                    </div>
+                    <div class="field is-grouped">
+                        <label class="label" for="listSelect">Select Tierlist: </label>
+                        <div class="select is-fullwidth">
+                            <select id="listSelect"></select>
+                        </div>
+                    </div>
+                    <input class="button" type="submit" value="Load List">
+                </form>
+            </div>
         </div>
-        <form id="tierRanker">
-            
-        </form>
+
+        <div class="columns is-vcentered">
+            <div class="column is-half m-auto">
+                <form class="form" id="listCreation"></form>
+            </div>
+        </div>
+
+        <div class="columns" id="tierList">
+            <div class="column is-two-thirds">
+                <h3 class="title has-text-centered" id="displayedListName"></h3>
+                <table class="table is-bordered is-striped is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>Tier</th>
+                            <th>Items</th>
+                        </tr>
+                    </thead>
+                    <tr>
+                        <th>S</th>
+                        <td id="6Items"></td>
+                    </tr>
+                    <tr>
+                        <th>A</th>
+                        <td id="5Items"></td>
+                    </tr>
+                    <tr>
+                        <th>B</th>
+                        <td id="4Items"></td>
+                    </tr>
+                    <tr>
+                        <th>C</th>
+                        <td id="3Items"></td>
+                    </tr>
+                    <tr>
+                        <th>D</th>
+                        <td id="2Items"></td>
+                    </tr>
+                    <tr>
+                        <th>F</th>
+                        <td id="1Items"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="column is-one-third">
+                <form class="field" id="listRanker">
+                    <h3 class="subtitle has-text-centered">Add your opinion!</h3>
+                    <ul id="rankerUL"></ul>
+        
+                    <input class="button" type="submit" value="Submit Rankings">
+                </form>
+            </div>
+        </div>
     </main>
 
     <footer></footer>
